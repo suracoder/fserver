@@ -1,0 +1,165 @@
+import React, { useEffect, useState } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import { styled } from '@material-ui/core/styles';
+import Paper from '@material-ui/core/Paper';
+import Grid from '@material-ui/core/Grid';
+import { connect } from "react-redux"
+//  import TravelFormAccess from "./TravelForm/TravelFormAccess"
+//  import TravelView from "./TravelView/TravelView"
+import PrivilegeChecker from 'view/MainApplication/PrivilegeChecker';
+import { fetchTravelDateSlotByCId } from "action/index"
+import SeatView from "../src/view/MainApplication/CompanyApplication/TravelDateSlot/SeatView/SeatView"
+import Button from "@material-ui/core/Button"
+import AirlineSeatReclineExtraIcon from '@material-ui/icons/AirlineSeatReclineExtra';
+import NeastedGrid from "../src/view/MainApplication/CompanyApplication/TravelDateSlot/TravelSlotView/NeastedGrid"
+import TextField from '@material-ui/core/TextField';
+import {getLeaftSeat} from "utils/seatUtils"
+const useStyles = makeStyles((theme) => ({
+    root: {
+        flexGrow: 1,
+        margin: 10,
+        marginLeft: 50
+    },
+    paper: {
+        padding: theme.spacing(0),
+        // textAlign: 'center',
+        color: theme.palette.text.secondary,
+        margin:4
+    },
+}));
+const Item = styled(Paper)(({ theme }) => ({
+    ...theme.typography.body2,
+    padding: theme.spacing(1),
+    textAlign: 'center',
+    color: "#fff",
+}));
+
+function Index(props) {
+    const classes = useStyles();
+
+    let [leftSeatCol, setLeftCol] = useState(0)
+    let [rightSeatCol, setRightCol] = useState(0)
+    let [colomen, setColomen] = useState(0)
+    let [row, setRow] = useState(0)
+    let [rightBreak, setRightBreak] = useState(9)
+    let [leftSeat, setLeftSeat] = useState([])
+    let [rightSeat, setRightSeat] = useState([])
+    let rigthRowCount = 0
+    let count = 0;
+
+    function NewArray(size, method, linear) {
+        method = method || (i => i);
+        linear = linear || false;
+        var x = [];
+        for (var i = 0; i < size; ++i)
+            x[i] = method(linear ? i / (size - 1) : i);
+        return x;
+    }
+    useEffect(() => {
+        props.fetchTravelDateSlotByCIdAction()
+
+    }, [])
+
+
+
+ 
+    // console.log("rigth sat >>",getRightSeat())
+
+    // console.log("seat>>>>>>>", getLeaftSeat())
+
+
+    // let Create = () => <Paper className={classes.paper}><TravelFormAccess data={props.data}/></Paper>
+    // console.log("props on index travel ",props)
+    // let BusViewComponent =()=><Paper className={classes.paper}><BusView /></Paper>
+    return (
+        <div className={classes.root}>
+            <Grid container spacing={1}>
+                <TextField
+                    onChange={(e) => {
+                        setRow(e.target.value)
+                    }}
+                    placeholder={"Max Seat Row"}
+                />
+
+                <TextField
+                    onChange={(e) => {
+                        setRightCol(e.target.value)
+                    }}
+                    placeholder={"leaf seat  "}
+                />
+                <TextField
+                    onChange={(e) => {
+                        setLeftCol(e.target.value)
+                    }}
+                    placeholder={"leaf seat  "}
+                />
+                {/* <Grid xs={12}><NeastedGrid /></Grid> */}
+
+                {/* <Grid item xs={6}> */}
+
+                {/* <Grid   > */}
+                <Grid container xs={6} md={6} >
+
+                    <Grid item xs={3}   className={classes.paper}>    {   NewArray(parseInt(row)).map(i => <Paper size="small"   className={classes.paper}>{getLeaftSeat().rowLeft[i].map(k => <Button  size="small">{k}<AirlineSeatReclineExtraIcon /> </Button>)} </Paper>)}
+                    </Grid>
+                    <Grid item xs={3}   className={classes.paper}>    {Array(parseInt(row)).fill(2).map(i => {
+                        count++
+                        console.log(count)
+                        if (count != row) {
+                            return (<Grid item   >
+                                <Paper    >   <Item> free space          </Item> </Paper>
+                            </Grid>)
+                        } else {
+                            return (<Grid item   className={classes.paper}><Paper size="small"   className={classes.paper} >{getLeaftSeat().rowLeft[0].map(i => <Button size="small" >{i}<AirlineSeatReclineExtraIcon /> </Button>)}</Paper></Grid>)
+                        }
+                        // {count==13?<Grid item ><Paper>{[1, 2].map(i => <Button><AirlineSeatReclineExtraIcon /> </Button>)}</Paper></Grid>:<Grid item >
+
+                        // </Grid>}
+
+                        //  return (
+
+
+                        //     <Grid item >
+
+                        //     </Grid>
+                        // )
+                    })}
+                    </Grid>
+                    <Grid item xs={3} className={classes.paper}>    { NewArray(parseInt(row)).map(i => {
+                        rigthRowCount++
+                        if (rightBreak != rigthRowCount) {
+                            return (
+                                <Paper   size="small"   className={classes.paper}>{getLeaftSeat().rowRight[i].map(k => <Button size="small"   >{k}<AirlineSeatReclineExtraIcon /> </Button>)}</Paper>
+
+                            )
+                        } else {
+                            return (<Paper  className={classes.paper}>   <Item> free space          </Item> </Paper>)
+                        }
+
+
+                    }
+
+
+
+
+                    )}
+                    </Grid>
+
+                    {/* </Grid> */}
+                </Grid>
+
+            </Grid>
+            {/* </Grid> */}
+        </div>
+    );
+}
+
+const mapStateToProps = state => ({
+    privilegeArray: state.privilegeArray.privilegeArray
+
+});
+const mapDispatchToProps = dispatch => ({
+    fetchTravelDateSlotByCIdAction: () => dispatch(fetchTravelDateSlotByCId())
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(Index);
